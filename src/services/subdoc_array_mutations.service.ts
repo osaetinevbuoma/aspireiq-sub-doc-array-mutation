@@ -1,13 +1,16 @@
 import _ from 'lodash';
+import IContentCreator from 'src/interfaces/IContentCreator';
+import IMention from '../interfaces/IMention';
+import IPost from '../interfaces/IPost';
 import { handleMentionsException, handlePostsException } from '../utils';
 import { ADD, REMOVE, UPDATE } from '../utils/constants';
 
 export const determineObjectType = (
-  mutation: { [key: string]: any },
+  mutation: IPost,
 ): boolean => _.hasIn(mutation, 'mentions');
 
 export const determineOpertionType = (
-  mutation: { [key: string]: any },
+  mutation: IPost,
   isPostsOperation: boolean,
 ): string => {
   if (isPostsOperation) {
@@ -24,22 +27,22 @@ export const determineOpertionType = (
     }
   } else {
     if (
-      _.has(mutation.mentions[0], '_delete')
-      && _.has(mutation.mentions[0], '_id')
+      _.has(mutation.mentions![0], '_delete')
+      && _.has(mutation.mentions![0], '_id')
     ) {
       return REMOVE;
     }
 
     if (
-      !_.has(mutation.mentions[0], '_delete')
-      && _.has(mutation.mentions[0], '_id')
+      !_.has(mutation.mentions![0], '_delete')
+      && _.has(mutation.mentions![0], '_id')
     ) {
       return UPDATE;
     }
 
     if (
-      !_.has(mutation.mentions[0], '_delete')
-      && !_.has(mutation.mentions[0], '_id')
+      !_.has(mutation.mentions![0], '_delete')
+      && !_.has(mutation.mentions![0], '_id')
     ) {
       return ADD;
     }
@@ -49,19 +52,19 @@ export const determineOpertionType = (
 };
 
 export const updateDocument = (
-  document: { [key: string]: any },
-  mutation: { [key: string]: any },
+  document: IContentCreator,
+  mutation: IPost,
   isPostsOperation: boolean,
-): { [key: string]: any } => {
+): { [key: string]: string } => {
   const output: { [key: string]: any } = {};
-  const statement: { [key: string]: any } = {};
+  const statement: { [key: string]: string | undefined } = {};
 
   const postIndex: number = _.findIndex(
     document.posts,
-    (post: { [key: string]: any }) => post._id === mutation._id,
+    (post: IPost) => post._id === mutation._id,
   );
   if (postIndex === -1) {
-    handlePostsException(mutation._id);
+    handlePostsException(mutation._id!);
   }
 
   if (isPostsOperation) {
@@ -73,22 +76,22 @@ export const updateDocument = (
   const post = document.posts[postIndex];
   const mentionsIndexInPost: number = _.findIndex(
     post.mentions,
-    (mention: { [key: string]: any }) => mention._id === mutation.mentions[0]._id,
+    (mention: IMention) => mention._id === mutation.mentions![0]._id,
   );
   if (mentionsIndexInPost === -1) {
-    handleMentionsException(mutation._id);
+    handleMentionsException(mutation._id!);
   }
 
-  statement[`posts.${postIndex}.mentions.${mentionsIndexInPost}.text`] = mutation.mentions[0].text;
+  statement[`posts.${postIndex}.mentions.${mentionsIndexInPost}.text`] = mutation.mentions![0].text;
   output[`${UPDATE}`] = statement;
   return output;
 };
 
 export const addDocument = (
-  document: { [key: string]: any },
-  mutation: { [key: string]: any },
+  document: IContentCreator,
+  mutation: IPost,
   isPostsOperation: boolean,
-): { [key: string]: any } => {
+): { [key: string]: string } => {
   if (isPostsOperation) {
     const output: { [key: string]: any } = {};
     output[`${ADD}`] = { posts: [{ value: mutation.value }] };
@@ -96,13 +99,13 @@ export const addDocument = (
   }
 
   const postIndex: number = _.findIndex(document.posts,
-    (post: { [key: string]: any }) => post._id === mutation._id);
+    (post: IPost) => post._id === mutation._id);
   if (postIndex === -1) {
-    handlePostsException(mutation._id);
+    handlePostsException(mutation._id!);
   }
 
   const statement: { [key: string]: any } = {};
-  statement[`posts.${postIndex}.mentions`] = [{ text: mutation.mentions[0].text }];
+  statement[`posts.${postIndex}.mentions`] = [{ text: mutation.mentions![0].text }];
 
   const output: { [key: string]: any } = {};
   output[`${ADD}`] = statement;
@@ -110,19 +113,19 @@ export const addDocument = (
 };
 
 export const removeDocument = (
-  document: { [key: string]: any },
-  mutation: { [key: string]: any },
+  document: IContentCreator,
+  mutation: IPost,
   isPostsOperation: boolean,
-): { [key: string]: any } => {
+): { [key: string]: string } => {
   const output: { [key: string]: any } = {};
-  const statement: { [key: string]: any } = {};
+  const statement: { [key: string]: boolean | undefined } = {};
 
   const postIndex: number = _.findIndex(
     document.posts,
-    (post: { [key: string]: any }) => post._id === mutation._id,
+    (post: IPost) => post._id === mutation._id,
   );
   if (postIndex === -1) {
-    handlePostsException(mutation._id);
+    handlePostsException(mutation._id!);
   }
 
   if (isPostsOperation) {
@@ -134,10 +137,10 @@ export const removeDocument = (
   const post = document.posts[postIndex];
   const mentionsIndexInPost: number = _.findIndex(
     post.mentions,
-    (mention: { [key: string]: any }) => mention._id === mutation.mentions[0]._id,
+    (mention: IMention) => mention._id === mutation.mentions![0]._id,
   );
   if (mentionsIndexInPost === -1) {
-    handleMentionsException(mutation._id);
+    handleMentionsException(mutation._id!);
   }
 
   statement[`posts.${postIndex}.mentions.${mentionsIndexInPost}`] = true;
@@ -146,8 +149,8 @@ export const removeDocument = (
 };
 
 export const generateUpdateStatement = (
-  document: { [key: string]: any },
-  mutation: { [key: string]: any },
+  document: IContentCreator,
+  mutation: { [key: string]: IPost[] },
 ): { [key: string]: any } => {
   let statement = {};
 

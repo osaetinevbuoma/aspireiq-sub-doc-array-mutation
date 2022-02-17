@@ -1,225 +1,131 @@
 
-# [Nodejs API Server](https://docs.appseed.us/boilerplate-code/api-server/node-js)
+# ASPIRE IQ - SUBDOCUMENT ARRAY MUTATION
 
-Express / Nodejs Starter with JWT authentication, and **SQLite** persistance - Provided by **AppSeed** [App Generator](https://appseed.us).
-Authentication Flow uses `json web tokens` via Passport library - `passport-jwt` strategy.
+## Overview
+AspireIQ uses a document database (amongst other storage solutions) to store high
+volume application data. Often, the application needs to manage an array of objects (i.e.
+posts, mentions) which get stored as properties of a root JSON document. For
+example, a content creator on the AspireIQ platform can be responsible for producing
+social posts as part of their relationship with the brands.
 
-<br />
+The document database supports the following operations for subdocument arrays:
+1. **$add**: adding new subdocument to the end of an array
+2. **$remove**: removing specific subdocuments by index (zero-based)
+3. **$update**: updating specific subdocuments by index (zero-based)
 
-> Features:
+This repository contains a generic routine named **generateUpdateStatement** that accepts as input
+the **original document**, a **mutation** describing the operation to execute (add/update/remove)
+and outputs the operation statement that occurred.
 
-- [API Definition](https://docs.appseed.us/boilerplate-code/api-unified-definition) - the unified API structure implemented by this server
-- Simple, intuitive codebase - can be extended with ease.  
-- TypeScript, Joy for validation
-- **Stack**: NodeJS / Express / SQLite / TypeORM
-- Auth: Passport / `passport-jwt` strategy 
-
-<br />
-
-> Tested with:
-
-| NodeJS | NPM | YARN | Status | 
-| --- | --- | --- | --- | 
-| `v16.13.0` | `v8.1.0`   | `v1.22.5` | ✔️ | 
-| `v14.15.0` | `v6.14.8`  | `v1.22.5` | ✔️ |
-| `v12.22.0` | `v6.14.11` | `v1.22.5` | ✔️ |
-
-<br />
-
-> Can be used with other [React Starters](https://appseed.us/apps/react) for a complete **Full-Stack** experience:
-
-| [React Node JS Berry](https://appseed.us/product/react-node-js-berry-dashboard) | [React Node Soft Dashboard](https://appseed.us/product/node-js-react-soft-dashboard) | [React Node Datta Able](https://github.com/app-generator/react-datta-able) |
-| --- | --- | --- |
-| [![React Node JS Berry](https://user-images.githubusercontent.com/51070104/124934742-aa392300-e00d-11eb-83bf-28d8b8704ec8.png)](https://appseed.us/product/react-node-js-berry-dashboard) | [![React Node Soft Dashboard](https://user-images.githubusercontent.com/51070104/137918158-54b20cce-1ac8-4279-ab89-aac0353ff7d3.png)](https://appseed.us/product/node-js-react-soft-dashboard) | [![React Node Datta Able](https://user-images.githubusercontent.com/51070104/125737710-834a9e6f-c39b-4f3b-a42a-9583ce2ce1da.png)](https://github.com/app-generator/react-datta-able)
-
-<br />
-
-![Nodejs API Server - Open-source Nodejs Starter provided by AppSeed.](https://user-images.githubusercontent.com/51070104/124414813-142aa180-dd5c-11eb-9279-6b082dadc51a.png)
-
-<br />
-
-## ✨ Requirements
-
-- [Node.js](https://nodejs.org/) >= 12.x
-- [SQLite](https://www.sqlite.org/index.html)
-
-<br />
-
-## ✨ How to use the code
-
-> **Step #1** - Clone the project
-
-```bash
-$ git clone https://github.com/app-generator/api-server-nodejs.git
-$ cd api-server-nodejs
+## Run Application
+1. Clone the repository
+2. Install dependencies
 ```
-
-<br />
-
-> **Step #2** - Install dependencies via NPM or Yarn
-
-```bash
-$ npm i
-// OR
-$ yarn
+    $ yarn install // or npm install
 ```
-
-<br />
-
-> **Step #3** - Run the SQLite migration via TypeORM
-
+3. (Optional) Run tests to see result of possible edge cases
 ```
-$ yarn typeorm migration:run
+    $ yarn test // or npm run test
 ```
-
-<br />
-
-> **Step #4** - Start the API server (development mode)
-
-```bash
-$ npm dev
-// OR
-$ yarn dev
+4. Start the server. The server runs on port 5000 or whatever port is configured in the `.env` file
 ```
-
-<br />
-
-> **Step #5** - Production Build (files generated in `build` directory)
-
-```bash
-$ npm build
-// OR
-$ yarn build
+    $ yarn dev // or npm run dev
 ```
-
-<br />
-
-> **Step #6** - Start the API server for production (files served from `build/index.js`)
-
-```bash
-$ npm start
-// OR
-$ yarn start
+5. In a client such as Insomnia, Postman or using curl, make a POST request to `http:localhost:5000/api/array-mutation`.
+Sample data in the request body
 ```
-
-The API server will start using the `PORT` specified in `.env` file (default 5000).
-
-<br />
-
-## ✨ Codebase Structure
-
-```bash
-< ROOT / src >
-     | 
-     |-- config/                              
-     |    |-- config.ts             # Configuration       
-     |    |-- passport.ts           # Define Passport Strategy             
-     | 
-     |-- migration/
-     |    |-- some_migration.ts     # database migrations
-     |
-     |-- models/                              
-     |    |-- activeSession.ts      # Sessions Model (Typeorm)              
-     |    |-- user.ts               # User Model (Typeorm) 
-     | 
-     |-- routes/                              
-     |    |-- users.ts              # Define Users API Routes
-     | 
-     | 
-     |-- index.js                   # API Entry Point
-     |-- .env                       # Specify the ENV variables
-     |                        
-     |-- ************************************************************************
+    {
+        "document": {
+            "_id": 1,
+            "name": "Johnny Content Creator",
+            "posts": [
+                {
+                    "_id": 2,
+                    "value": "one",
+                    "mentions": []
+                },
+                {
+                    "_id": 3,
+                    "value": "two",
+                    "mentions": [
+                        {
+                            "_id": 5,
+                            "text": "apple"
+                        },
+                        {
+                            "_id": 6,
+                            "text": "orange"
+                        }
+                    ]
+                },
+                {
+                    "_id": 4,
+                    "value": "three",
+                    "mentions": []
+                },
+                {
+                    "_id": 7,
+                    "value": "four",
+                    "mentions": [
+                        {
+                            "_id": 8,
+                            "text": "plum"
+                        },
+                        {
+                            "_id": 9,
+                            "text": "avocado"
+                        },
+                        {
+                            "_id": 10,
+                            "text": "grapes"
+                        }
+                    ]
+                }
+            ]
+        },
+        "mutation": {
+            "posts": [
+                { "_id": 2, "value": "too" }
+            ]
+        }
+    }
 ```
-
-<br />
-
-## ✨ SQLite Path
-
-The SQLite Path is set in `.env`, as `SQLITE_PATH`
-
-<br />
-
-## ✨ Database migration
-
-> Generate migration:
-
-```bash
-$ yarn typeorm migration:generate -n your_migration_name
+Sample response
 ```
-
-> run migration: 
-
-```bash
-$ yarn typeorm migration:run
+    {
+        "$update": {
+            "posts.0.value": "too"
+        }
+    }
 ```
+Indicating that an update operation was made to the `value` key of the first index of the `posts`.
 
-<br />
-
-## ✨ API
-
-For a fast set up, use this POSTMAN file: [api_sample](https://github.com/app-generator/api-server-nodejs-pro/blob/master/media/api.postman_collection.json)
-
-> **Register** - `api/users/register`
-
+## Assumptions
+1. Inputs (mutations) can only contain arrays of size 1. Example
 ```
-POST api/users/register
-Content-Type: application/json
-
-{
-    "username":"test",
-    "password":"pass", 
-    "email":"test@appseed.us"
-}
+    posts: [{ _id: 2, value: 'too' }]
+    posts: [{ _id: 4, mentions: [{ text: 'banana' }] }]
+    posts: [{ _id: 7, _delete: true }]
 ```
-
-<br />
-
-> **Login** - `api/users/login`
-
+2. Original document expected must be for only one content creator because the expected output does
+not take into consideration multiple content creators
+3. Operations in single statements must be unique because the output keys only contain objects
 ```
-POST /api/users/login
-Content-Type: application/json
+    // Valid
+    {
+        posts: [
+            { _id: 2, value: 'too' },
+            { _id: 4, mentions: [{ text: 'banana' }] },
+            { _id: 7, _delete: true }
+        ]
+    }
 
-{
-    "password":"pass", 
-    "email":"test@appseed.us"
-}
+    // Invalid
+    {
+        posts: [
+            { _id: 2, mentions: [{ text: 'kiwi' }] },
+            { _id: 4, mentions: [{ text: 'banana' }] },
+            { _id: 7, _delete: true }
+        ]
+    }
 ```
-
-<br />
-
-> **Logout** - `api/users/logout`
-
-```
-POST api/users/logout
-Content-Type: application/json
-authorization: JWT_TOKEN (returned by Login request)
-
-{
-    "token":"JWT_TOKEN"
-}
-```
-
-<br />
-
-## ✨ Run the Tests
-
-```yarn test```
-
-<br />
-
-
-## ✨ Credits
-
-This software is provided by the core AppSeed team with an inspiration from other great NodeJS starters: 
-
-- Initial verison - coded by [Teo Deleanu](https://www.linkedin.com/in/teodeleanu/)
-- [Hackathon Starter](https://github.com/sahat/hackathon-starter) - A truly amazing boilerplate for Node.js apps
-- [Node Server Boilerplate](https://github.com/hagopj13/node-express-boilerplate) - just another cool starter
-- [React NodeJS Argon](https://github.com/creativetimofficial/argon-dashboard-react-nodejs) - released by **Creative-Tim** and [ProjectData](https://projectdata.dev/)
-
-<br />
-
----
-**[Node JS API Server](https://docs.appseed.us/boilerplate-code/api-server/node-js)** - provided by AppSeed [App Generator](https://appseed.us)
