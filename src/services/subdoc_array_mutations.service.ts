@@ -5,10 +5,16 @@ import IPost from '../interfaces/IPost';
 import { handleMentionsException, handlePostsException } from '../utils';
 import { ADD, REMOVE, UPDATE } from '../utils/constants';
 
+/**
+ * Utility function to help determine if we're dealing with posts or mentions
+ */
 export const determineObjectType = (
   mutation: IPost,
 ): boolean => _.hasIn(mutation, 'mentions');
 
+/**
+ * Utility function to determine if we're performing an update, add, or remove operation
+ */
 export const determineOpertionType = (
   mutation: IPost,
   isPostsOperation: boolean,
