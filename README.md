@@ -101,31 +101,24 @@ Sample response
 Indicating that an update operation was made to the `value` key of the first index of the `posts`.
 
 ## Assumptions
-1. Inputs (mutations) can only contain arrays of size 1. Example
+1. If one operation type is requested, the resulting output will be an object, e.g.
 ```
-    posts: [{ _id: 2, value: 'too' }]
-    posts: [{ _id: 4, mentions: [{ text: 'banana' }] }]
-    posts: [{ _id: 7, _delete: true }]
-```
-2. Original document expected must be for only one content creator because the expected output does
-not take into consideration multiple content creators
-3. Operations in single statements must be unique because the output keys only contain objects
-```
-    // Valid
     {
-        posts: [
-            { _id: 2, value: 'too' },
-            { _id: 4, mentions: [{ text: 'banana' }] },
-            { _id: 7, _delete: true }
-        ]
+        "$update": {"posts.0.value": "too"},
+        "$add": {"posts": [{"value": "four"}] },
+        "$remove" : {"posts.2" : true}
     }
-
-    // Invalid
+```
+2. If more than one operation type is request, e.g. multiple additions, the resulting output will
+be an array.
+```
     {
-        posts: [
-            { _id: 2, mentions: [{ text: 'kiwi' }] },
-            { _id: 4, mentions: [{ text: 'banana' }] },
-            { _id: 7, _delete: true }
+        $update: { 'posts.3.mentions.1.likes.1.up': 5 },
+        $remove: { 'posts.3.mentions.1.likes.0': true },
+        $add: [
+            { 'posts.1.mentions.0.likes': [{ up: 10 }] },
+            { 'posts.1.mentions.1.likes': [{ up: 15 }] },
+            { 'posts.3.mentions.0.likes': [{ up: 24 }] },
         ]
     }
 ```

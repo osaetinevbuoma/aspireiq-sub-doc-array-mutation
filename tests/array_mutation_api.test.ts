@@ -1,7 +1,11 @@
 import request from 'supertest';
 
 import app from '../src/server';
-import { TEST_MENTIONS, TEST_OBJECT, TEST_POSTS } from './test.data';
+import {
+  TEST_MENTIONS,
+  TEST_OBJECT,
+  TEST_POSTS,
+} from './test.data';
 
 const API_ENDPOINT = '/api/array-mutation';
 
@@ -19,6 +23,10 @@ describe('Test generic routine via API requests', () => {
           $update: { 'posts.0.value': TEST_POSTS.update.posts[0].value },
         });
         done();
+      })
+      .catch((error) => {
+        console.error(error);
+        done();
       });
   });
 
@@ -34,6 +42,10 @@ describe('Test generic routine via API requests', () => {
         expect(response.body).toStrictEqual({
           $update: { 'posts.1.mentions.0.text': TEST_MENTIONS.update.posts[0].mentions[0].text },
         });
+        done();
+      })
+      .catch((error) => {
+        console.error(error);
         done();
       });
   });
@@ -51,6 +63,10 @@ describe('Test generic routine via API requests', () => {
           $add: TEST_POSTS.add,
         });
         done();
+      })
+      .catch((error) => {
+        console.error(error);
+        done();
       });
   });
 
@@ -66,6 +82,10 @@ describe('Test generic routine via API requests', () => {
         expect(response.body).toStrictEqual({
           $add: { 'posts.2.mentions': TEST_MENTIONS.add.posts[0].mentions },
         });
+        done();
+      })
+      .catch((error) => {
+        console.error(error);
         done();
       });
   });
@@ -83,6 +103,10 @@ describe('Test generic routine via API requests', () => {
           $remove: { 'posts.3': true },
         });
         done();
+      })
+      .catch((error) => {
+        console.error(error);
+        done();
       });
   });
 
@@ -98,6 +122,10 @@ describe('Test generic routine via API requests', () => {
         expect(response.body).toStrictEqual({
           $remove: { 'posts.3.mentions.1': true },
         });
+        done();
+      })
+      .catch((error) => {
+        console.error(error);
         done();
       });
   });
@@ -118,6 +146,10 @@ describe('Test generic routine via API requests', () => {
           $update: { 'posts.0.value': TEST_POSTS.update.posts[0].value },
           $remove: { 'posts.3': true },
         });
+        done();
+      })
+      .catch((error) => {
+        console.error(error);
         done();
       });
   });
@@ -143,6 +175,10 @@ describe('Test generic routine via API requests', () => {
           $remove: { 'posts.3.mentions.1': true },
         });
         done();
+      })
+      .catch((error) => {
+        console.error(error);
+        done();
       });
   });
 
@@ -166,6 +202,10 @@ describe('Test generic routine via API requests', () => {
           $update: { 'posts.1.mentions.0.text': TEST_MENTIONS.update.posts[0].mentions[0].text },
           $remove: { 'posts.3.mentions.1': true },
         });
+        done();
+      })
+      .catch((error) => {
+        console.error(error);
         done();
       });
   });

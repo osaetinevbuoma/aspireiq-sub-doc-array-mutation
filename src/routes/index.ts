@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import _ from 'lodash';
 
 import { HttpStatus } from '../utils/constants';
-import * as services from '../services/subdoc_array_mutations.service';
+import * as services from '../services/mutation.service';
 
 const router = express.Router();
 
